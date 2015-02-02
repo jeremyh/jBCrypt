@@ -180,7 +180,7 @@ public class TestBCrypt extends TestCase {
 	 */
 	public void testInternationalChars() {
 		System.out.print("BCrypt.hashpw w/ international chars: ");
-		String pw1 = "ππππππππ";
+		String pw1 = "\u2605\u2605\u2605\u2605\u2605\u2605\u2605\u2605";
 		String pw2 = "????????";
 
 		String h1 = BCrypt.hashpw(pw1, BCrypt.gensalt());
