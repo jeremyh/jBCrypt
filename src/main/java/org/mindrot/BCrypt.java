@@ -68,8 +68,22 @@ public final class BCrypt {
     public static final int GENSALT_DEFAULT_LOG2_ROUNDS = 10;
     public static final int BCRYPT_SALT_LEN = 16;
 
-    public static final char A_MINOR = 'a';
-	public static final char Y_MINOR = 'y';
+    // Blowfish parameters
+    public static final int BLOWFISH_NUM_ROUNDS = 16;
+
+    /**
+     * Different types of compatible blowfish minors
+     */
+    enum Minor {
+        A('a'), //"2a" - some implementations suffered from a very rare security flaw. current default for compatibility purposes.
+        Y('y'); //"2y" - format specific to the crypt_blowfish BCrypt implementation, identical to "2a" in all but name.
+
+        private final char minor;
+
+        Minor(char minor) {
+            this.minor = minor;
+        }
+    }
 
     /**
      * Check that a plaintext password matches a previously hashed
@@ -78,52 +92,80 @@ public final class BCrypt {
      * @param hashed	the previously-hashed password
      * @return	true if the passwords match, false otherwise
      */
+    public static boolean checkpw(String plaintext, String hashed, Minor minor) {
+        return checkPassword(plaintext, hashed, minor.minor);
+    }
+
+
+    /**
+     * Use the {@link #checkpw(String, String, Minor)} (String, String, Minor)} method.
+     */
     public static boolean checkpw(String plaintext, String hashed) {
-        return checkPassword(plaintext, hashed);
+        return checkpw(plaintext, hashed, Minor.A);
     }
 
     /**
-	 * Hash a password using the OpenBSD bcrypt scheme
-	 * @param password	the password to hash
-	 * @param salt	the salt to hash with (perhaps generated
-	 * using BCrypt.gensalt)
-	 * @return	the hashed password
-	 */
-	public static String hashpw(String password, String salt) {
-        return generateHash(password, salt);
+     * Hash a password using the OpenBSD bcrypt scheme
+     * @param password	the password to hash
+     * @param salt	the salt to hash with (perhaps generated
+     * using BCrypt.gensalt)
+     * @return	the hashed password
+     */
+    public static String hashpw(String password, String salt, Minor minor) {
+        return generateHash(password, salt, minor.minor);
+    }
+
+    /**
+     * Use the {@link #hashpw(String, String, Minor)} (String, String, char)} method.
+     */
+    public static String hashpw(String password, String salt) {
+        return hashpw(password, salt, Minor.A);
 	}
 
     /**
-     * Generate a salt for use with the BCrypt.hashpw() method,
-     * selecting a reasonable default for the number of hashing
-     * rounds to apply
-     * @return	an encoded salt value
+     * Use the {@link #gensalt(int, SecureRandom, Minor)} method.
      */
     public static String gensalt() {
         return gensalt(GENSALT_DEFAULT_LOG2_ROUNDS);
     }
+    /**
+     * Use the {@link #gensalt(int, SecureRandom, Minor)} method.
+     */
+    public static String gensalt(Minor minor) {
+        return gensalt(GENSALT_DEFAULT_LOG2_ROUNDS, minor);
+    }
+
+    /**
+     * Use the {@link #gensalt(int, SecureRandom, Minor)} method.
+     */
+    public static String gensalt(int log_rounds) {
+        return gensalt(log_rounds, new SecureRandom());
+    }
+
+    /**
+     * Use the {@link #gensalt(int, SecureRandom, Minor)} method.
+     */
+    public static String gensalt(int log_rounds, Minor minor) {
+        return gensalt(log_rounds, new SecureRandom(), minor);
+    }
+
+	/**
+     * Use the {@link #gensalt(int, SecureRandom, Minor)} method.
+
+	 */
+	public static String gensalt(int log_rounds, SecureRandom random) {
+        return generateSalt(log_rounds, random, Minor.A.minor);
+	}
 
     /**
      * Generate a salt for use with the BCrypt.hashpw() method
      * @param log_rounds	the log2 of the number of rounds of
      * hashing to apply - the work factor therefore increases as
      * 2**log_rounds.
+     * @param random		an instance of SecureRandom to use
      * @return	an encoded salt value
      */
-    public static String gensalt(int log_rounds) {
-        return gensalt(log_rounds, new SecureRandom());
+    public static String gensalt(int log_rounds, SecureRandom random, Minor minor) {
+        return generateSalt(log_rounds, random, minor.minor);
     }
-
-	/**
-	 * Generate a salt for use with the BCrypt.hashpw() method
-	 * @param log_rounds	the log2 of the number of rounds of
-	 * hashing to apply - the work factor therefore increases as
-	 * 2**log_rounds.
-	 * @param random		an instance of SecureRandom to use
-	 * @return	an encoded salt value
-	 */
-	public static String gensalt(int log_rounds, SecureRandom random) {
-        return generateSalt(log_rounds, random);
-	}
-
 }

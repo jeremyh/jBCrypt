@@ -283,17 +283,15 @@ public class BcryptImpl {
 		0x4f727068, 0x65616e42, 0x65686f6c,
 		0x64657253, 0x63727944, 0x6f756274
 	};
-    // Blowfish parameters
-protected static final int BLOWFISH_NUM_ROUNDS = 16;
     // Expanded Blowfish key
 	private int[] P;
     private int[] S;
 
-    public static boolean checkPassword(String plaintext, String hashed) {
+    public static boolean checkPassword(String plaintext, String hashed, char minor) {
         byte hashed_bytes[];
         byte try_bytes[];
         try {
-            String try_pw = generateHash(plaintext, hashed);
+            String try_pw = generateHash(plaintext, hashed, minor);
             hashed_bytes = hashed.getBytes("UTF-8");
             try_bytes = try_pw.getBytes("UTF-8");
         } catch (UnsupportedEncodingException uee) {
@@ -307,7 +305,7 @@ protected static final int BLOWFISH_NUM_ROUNDS = 16;
         return ret == 0;
     }
 
-    public static String generateHash(String password, String salt) {
+    public static String generateHash(String password, String salt, char targetMinor) {
         String real_salt;
         byte passwordb[], saltb[], hashed[];
         char minor = (char)0;
@@ -320,7 +318,7 @@ protected static final int BLOWFISH_NUM_ROUNDS = 16;
             off = 3;
         else {
             minor = salt.charAt(2);
-            if (minor != BCrypt.A_MINOR || salt.charAt(3) != '$')
+            if (minor != targetMinor || salt.charAt(3) != '$')
                 throw new IllegalArgumentException ("Invalid salt revision");
             off = 4;
         }
@@ -332,7 +330,7 @@ protected static final int BLOWFISH_NUM_ROUNDS = 16;
 
         real_salt = salt.substring(off + 3, off + 25);
         try {
-            passwordb = (password + (minor >= BCrypt.A_MINOR ? "\000" : "")).getBytes("UTF-8");
+            passwordb = (password + (minor >= targetMinor ? "\000" : "")).getBytes("UTF-8");
         } catch (UnsupportedEncodingException uee) {
             throw new AssertionError("UTF-8 is not supported");
         }
@@ -345,7 +343,7 @@ protected static final int BLOWFISH_NUM_ROUNDS = 16;
                 (int[]) bf_crypt_ciphertext.clone());
 
         rs.append("$2");
-        if (minor >= BCrypt.A_MINOR)
+        if (minor >= targetMinor)
             rs.append(minor);
         rs.append("$");
         if (rounds < 10)
@@ -362,13 +360,13 @@ protected static final int BLOWFISH_NUM_ROUNDS = 16;
         return rs.toString();
     }
 
-    public static String generateSalt(int log_rounds, SecureRandom random) {
+    public static String generateSalt(int log_rounds, SecureRandom random, char minor) {
         StringBuilder rs = new StringBuilder();
         byte rnd[] = new byte[BCrypt.BCRYPT_SALT_LEN];
 
         random.nextBytes(rnd);
 
-        rs.append("$2" + BCrypt.A_MINOR + "$");
+        rs.append("$2" + minor + "$");
         if (log_rounds < 10)
             rs.append("0");
         if (log_rounds > 30) {
@@ -523,7 +521,7 @@ protected static final int BLOWFISH_NUM_ROUNDS = 16;
         int i, n, l = lr[off], r = lr[off + 1];
 
         l ^= P[0];
-        for (i = 0; i <= BLOWFISH_NUM_ROUNDS - 2;) {
+        for (i = 0; i <= BCrypt.BLOWFISH_NUM_ROUNDS - 2;) {
             // Feistel substitution on left word
             n = S[(l >> 24) & 0xff];
             n += S[0x100 | ((l >> 16) & 0xff)];
@@ -538,7 +536,7 @@ protected static final int BLOWFISH_NUM_ROUNDS = 16;
             n += S[0x300 | (r & 0xff)];
             l ^= n ^ P[++i];
         }
-        lr[off] = r ^ P[BLOWFISH_NUM_ROUNDS + 1];
+        lr[off] = r ^ P[BCrypt.BLOWFISH_NUM_ROUNDS + 1];
         lr[off + 1] = l;
     }
 }
