@@ -118,7 +118,7 @@ public class TestBCrypt extends TestCase {
 			String plain = test_vectors[i][0];
 			String salt = test_vectors[i][1];
 			String expected = test_vectors[i][2];
-			String hashed = BCrypt.hashpw(plain, salt);
+			String hashed = BCrypt.hashpw(plain, salt, BCrypt.Minor.Y);
 			assertEquals(hashed, expected);
 			System.out.print(".");
 		}
