@@ -97,7 +97,7 @@ public class TestBCrypt extends TestCase {
 	 * Test method for 'BCrypt.hashpw(String, String)'
 	 */
 	public void testHashpw() {
-		System.out.print("BCrypt.hashpw(): ");
+		System.out.print("BCrypt.hashpw(String, String): ");
 		for (int i = 0; i < test_vectors.length; i++) {
 			String plain = test_vectors[i][0];
 			String salt = test_vectors[i][1];
@@ -110,9 +110,27 @@ public class TestBCrypt extends TestCase {
 	}
 
 	/**
+	 * Test method for 'BCrypt.hashpw(String, String, Minor)'
+	 */
+	public void testHashpwMinor() {
+		System.out.print("BCrypt.hashpw(String, String, Minor): ");
+		for (int i = 0; i < test_vectors.length; i++) {
+			String plain = test_vectors[i][0];
+			String salt = test_vectors[i][1];
+			String expected = test_vectors[i][2];
+			String hashed = BCrypt.hashpw(plain, salt);
+			assertEquals(hashed, expected);
+			System.out.print(".");
+		}
+		System.out.println("");
+	}
+
+
+
+	/**
 	 * Test method for 'BCrypt.gensalt(int)'
 	 */
-	public void testGensaltInt() {
+	public void testGensaltLogRounds() {
 		System.out.print("BCrypt.gensalt(log_rounds):");
 		for (int i = 4; i <= 12; i++) {
 			System.out.print(" " + Integer.toString(i) + ":");
@@ -144,7 +162,24 @@ public class TestBCrypt extends TestCase {
 		System.out.println("");
 	}
 
-	/**
+    /**
+     * Test method for 'BCrypt.gensalt(Minor)'
+     */
+    public void testGensaltMinor() {
+        System.out.print("BCrypt.gensalt(Minor): ");
+        for (int i = 0; i < test_vectors.length; i += 4) {
+            String plain = test_vectors[i][0];
+            String salt = BCrypt.gensalt(BCrypt.Minor.Y);
+            String hashed1 = BCrypt.hashpw(plain, salt, BCrypt.Minor.Y);
+            String hashed2 = BCrypt.hashpw(plain, hashed1, BCrypt.Minor.Y);
+            assertEquals(hashed1, hashed2);
+            System.out.print(".");
+        }
+        System.out.println("");
+    }
+
+
+    /**
 	 * Test method for 'BCrypt.checkpw(String, String)'
 	 * expecting success
 	 */
