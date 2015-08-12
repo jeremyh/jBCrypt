@@ -74,7 +74,7 @@ public final class BCrypt {
     /**
      * Different types of compatible blowfish minors
      */
-    enum Minor {
+    public enum Minor {
         A('a'), //"2a" - some implementations suffered from a very rare security flaw. current default for compatibility purposes.
         Y('y'); //"2y" - format specific to the crypt_blowfish BCrypt implementation, identical to "2a" in all but name.
 
