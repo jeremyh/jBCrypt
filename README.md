@@ -61,6 +61,6 @@ Use it in your project by adding the following to your project *pom.xml*:
         <dependency>
             <groupId>org.mindrot</groupId>
             <artifactId>jbcrypt</artifactId>
-            <version>0.3</version>
+            <version>0.3m</version>
         </dependency>
 
