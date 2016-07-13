@@ -1,6 +1,8 @@
 jBCrypt is subject to the following license:
 
 /*
+ * ISC License
+ *
  * Copyright (c) 2006 Damien Miller <djm@mindrot.org>
  *
  * Permission to use, copy, modify, and distribute this software for any
