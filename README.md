@@ -64,3 +64,8 @@ Use it in your project by adding the following to your project *pom.xml*:
             <version>0.3</version>
         </dependency>
 
+## Gradle setup
+
+Add to your dependencies task (make sure mavenCentral() is in your repositories task) the following:
+
+	compile "org.mindrot:jbcrypt:0.3m"
