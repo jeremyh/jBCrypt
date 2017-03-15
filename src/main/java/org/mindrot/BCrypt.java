@@ -388,7 +388,7 @@ public class BCrypt {
 	private static String encode_base64(byte d[], int len)
 		throws IllegalArgumentException {
 		int off = 0;
-		StringBuffer rs = new StringBuffer();
+		StringBuilder rs = new StringBuilder();
 		int c1, c2;
 
 		if (len <= 0 || len > d.length)
@@ -425,9 +425,10 @@ public class BCrypt {
 	 * @return	the decoded value of x
 	 */
 	private static byte char64(char x) {
-		if ((int)x < 0 || (int)x > index_64.length)
+		int index = x;
+		if (index >= index_64.length)
 			return -1;
-		return index_64[(int)x];
+		return index_64[index];
 	}
 
 	/**
@@ -441,7 +442,7 @@ public class BCrypt {
 	 */
 	private static byte[] decode_base64(String s, int maxolen)
 		throws IllegalArgumentException {
-		StringBuffer rs = new StringBuffer();
+		StringBuilder rs = new StringBuilder();
 		int off = 0, slen = s.length(), olen = 0;
 		byte ret[];
 		byte c1, c2, c3, c4, o;
@@ -486,7 +487,7 @@ public class BCrypt {
 	 * @param lr	an array containing the two 32-bit half blocks
 	 * @param off	the position in the array of the blocks
 	 */
-	private final void encipher(int lr[], int off) {
+	private void encipher(int lr[], int off) {
 		int i, n, l = lr[off], r = lr[off + 1];
 
 		l ^= P[0];
@@ -652,9 +653,9 @@ public class BCrypt {
 		BCrypt B;
 		String real_salt;
 		byte passwordb[], saltb[], hashed[];
-		char minor = (char)0;
+		char minor = 0;
 		int rounds, off = 0;
-		StringBuffer rs = new StringBuffer();
+		StringBuilder rs = new StringBuilder();
 
 		if (salt.charAt(0) != '$' || salt.charAt(1) != '2')
 			throw new IllegalArgumentException ("Invalid salt version");
@@ -712,7 +713,7 @@ public class BCrypt {
 	 * @return	an encoded salt value
 	 */
 	public static String gensalt(int log_rounds, SecureRandom random) {
-		StringBuffer rs = new StringBuffer();
+		StringBuilder rs = new StringBuilder();
 		byte rnd[] = new byte[BCRYPT_SALT_LEN];
 
 		random.nextBytes(rnd);
