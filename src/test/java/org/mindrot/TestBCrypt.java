@@ -83,6 +83,32 @@ public class TestBCrypt extends TestCase {
 			{ "~!@#$%^&*()      ~!@#$%^&*()PNBFRD",
 			"$2a$12$WApznUOJfkEGSmYRfnkrPO",
 			"$2a$12$WApznUOJfkEGSmYRfnkrPOr466oFDCaj4b6HY3EXGvfxm43seyhgC" },
+
+			{ "abc",
+					"$2x$06$If6bvum7DFjUnE9p2uDeDu",
+					"$2x$06$If6bvum7DFjUnE9p2uDeDu0YHzrHM6tf.iqN8.yx.jNN1ILEf7h0i" },
+			{ "abc",
+					"$2x$08$Ro0CUfOqk6cXEKf3dyaM7O",
+					"$2x$08$Ro0CUfOqk6cXEKf3dyaM7OhSCvnwM9s4wIX9JeLapehKK5YdLxKcm" },
+			{ "abc",
+					"$2x$10$WvvTPHKwdBJ3uk0Z37EMR.",
+					"$2x$10$WvvTPHKwdBJ3uk0Z37EMR.hLA2W6N9AEBhEgrAOljy2Ae5MtaSIUi" },
+			{ "abc",
+					"$2x$12$EXRkfkdmXn2gzds2SSitu.",
+					"$2x$12$EXRkfkdmXn2gzds2SSitu.MW9.gAVqa9eLS1//RYtYCmB1eLHg.9q" },
+
+			{ "a",
+					"$2y$06$m0CrhHm10qJ3lXRY.5zDGO",
+					"$2y$06$m0CrhHm10qJ3lXRY.5zDGO3rS2KdeeWLuGmsfGlMfOxih58VYVfxe" },
+			{ "a",
+					"$2y$08$cfcvVd2aQ8CMvoMpP2EBfe",
+					"$2y$08$cfcvVd2aQ8CMvoMpP2EBfeodLEkkFJ9umNEfPD18.hUF62qqlC/V." },
+			{ "a",
+					"$2y$10$k87L/MF28Q673VKh8/cPi.",
+					"$2y$10$k87L/MF28Q673VKh8/cPi.SUl7MU/rWuSiIDDFayrKk/1tBsSQu4u" },
+			{ "a",
+					"$2y$12$8NJH3LsPrANStV6XtBakCe",
+					"$2y$12$8NJH3LsPrANStV6XtBakCez0cKHXVxmvxIlcz785vxAIZrihHZpeS" },
 		};
 
 	/**
