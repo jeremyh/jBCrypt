@@ -661,8 +661,10 @@ public class BCrypt {
 		if (salt.charAt(2) == '$')
 			off = 3;
 		else {
+			if (salt.charAt(3) != '$')
+				throw new IllegalArgumentException ("Invalid salt revision");
 			minor = salt.charAt(2);
-			if (minor != 'a' || salt.charAt(3) != '$')
+			if (minor < 'a' || minor > 'b')
 				throw new IllegalArgumentException ("Invalid salt revision");
 			off = 4;
 		}
@@ -677,6 +679,27 @@ public class BCrypt {
 			passwordb = (password + (minor >= 'a' ? "\000" : "")).getBytes("UTF-8");
 		} catch (UnsupportedEncodingException uee) {
 			throw new AssertionError("UTF-8 is not supported");
+		}
+
+		if (minor == 'b') {
+			/* Revision b fixed a bug in the OpenBSD
+			 * implementation where passwords lengths
+			 * larger than 256 bytes were unintionally
+			 * wrapped due to integer overflow. It does
+			 * this by capping the password length to 72
+			 * characters (excluding the NUL-terminator,
+			 * therefore 73).
+			 * 
+			 * There should technically be no need to do
+			 * so explicitly here since the encryption
+			 * function only uses the first two 72 bytes
+			 * anyway, but do it anyway for compatibility
+			 * "just in case". */
+			if (passwordb.length > 73) {
+				byte[] trim = new byte[73];
+				System.arraycopy(passwordb, 0, trim, 0, 73);
+				passwordb = trim;
+			}
 		}
 
 		saltb = decode_base64(real_salt, BCRYPT_SALT_LEN);
