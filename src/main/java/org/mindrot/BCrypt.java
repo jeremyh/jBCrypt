@@ -664,7 +664,7 @@ public class BCrypt {
 			if (salt.charAt(3) != '$')
 				throw new IllegalArgumentException ("Invalid salt revision");
 			minor = salt.charAt(2);
-			if (minor < 'a' || minor > 'b')
+			if (minor != 'a' && minor != 'b' && minor != 'y')
 				throw new IllegalArgumentException ("Invalid salt revision");
 			off = 4;
 		}
