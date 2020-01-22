@@ -731,16 +731,23 @@ public class BCrypt {
 	 * @param log_rounds	the log2 of the number of rounds of
 	 * hashing to apply - the work factor therefore increases as
 	 * 2**log_rounds.
+	 * @param minor		the minor revision of the algorithm to use;
+	 * the latest revision is 'b'. Other accepted revisions are 'a'
+	 * and 'y'.
 	 * @param random		an instance of SecureRandom to use
 	 * @return	an encoded salt value
 	 */
-	public static String gensalt(int log_rounds, SecureRandom random) {
+	public static String gensalt(int log_rounds, char minor, SecureRandom random) {
 		StringBuffer rs = new StringBuffer();
 		byte rnd[] = new byte[BCRYPT_SALT_LEN];
 
 		random.nextBytes(rnd);
 
-		rs.append("$2a$");
+		if (minor != 'a' && minor != 'b' && minor != 'y')
+			throw new IllegalArgumentException(
+				"unsupported minor revision: " + minor);
+
+		rs.append("$2" + minor + "$");
 		if (log_rounds < 10)
 			rs.append("0");
 		if (log_rounds > 30) {
@@ -758,10 +765,44 @@ public class BCrypt {
 	 * @param log_rounds	the log2 of the number of rounds of
 	 * hashing to apply - the work factor therefore increases as
 	 * 2**log_rounds.
+	 * @param random		an instance of SecureRandom to use
+	 * @return	an encoded salt value
+	 */
+	public static String gensalt(int log_rounds, SecureRandom random) {
+		/* Support for b-hashes was added on Jan 22, 2020. The
+		 * default revision of generated salts should arguably
+		 * be cahgned to 'b' after some reasonable transition
+		 * period. (A year?) */
+		return gensalt(log_rounds, 'a', random);
+	}
+
+	/**
+	 * Generate a salt for use with the BCrypt.hashpw() method
+	 * @param log_rounds	the log2 of the number of rounds of
+	 * hashing to apply - the work factor therefore increases as
+	 * 2**log_rounds.
+	 * @param minor		the minor revision of the algorithm to use;
+	 * the latest revision is 'b'. Other accepted revisions are 'a'
+	 * and 'y'.
+	 * @return	an encoded salt value
+	 */
+	public static String gensalt(int log_rounds, char minor) {
+		return gensalt(log_rounds, minor, new SecureRandom());
+	}
+
+	/**
+	 * Generate a salt for use with the BCrypt.hashpw() method
+	 * @param log_rounds	the log2 of the number of rounds of
+	 * hashing to apply - the work factor therefore increases as
+	 * 2**log_rounds.
 	 * @return	an encoded salt value
 	 */
 	public static String gensalt(int log_rounds) {
-		return gensalt(log_rounds, new SecureRandom());
+		/* Support for b-hashes was added on Jan 22, 2020. The
+		 * default revision of generated salts should arguably
+		 * be cahgned to 'b' after some reasonable transition
+		 * period. (A year?) */
+		return gensalt(log_rounds, 'a');
 	}
 
 	/**
