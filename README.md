@@ -1,6 +1,6 @@
 # JBCrypt
-jBCrypt is an implementation the OpenBSD Blowfish password hashing algorithm,
-as described in ["A Future-Adaptable Password
+jBCrypt is an implementation of the OpenBSD Blowfish password hashing
+algorithm, as described in ["A Future-Adaptable Password
 Scheme"](http://www.openbsd.org/papers/bcrypt-paper.ps) by Niels Provos and
 David Mazieres.  
 
