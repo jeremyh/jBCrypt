@@ -661,8 +661,10 @@ public class BCrypt {
 		if (salt.charAt(2) == '$')
 			off = 3;
 		else {
+			if (salt.charAt(3) != '$')
+				throw new IllegalArgumentException ("Invalid salt revision");
 			minor = salt.charAt(2);
-			if (minor != 'a' || salt.charAt(3) != '$')
+			if (minor != 'a' && minor != 'b' && minor != 'y')
 				throw new IllegalArgumentException ("Invalid salt revision");
 			off = 4;
 		}
@@ -677,6 +679,27 @@ public class BCrypt {
 			passwordb = (password + (minor >= 'a' ? "\000" : "")).getBytes("UTF-8");
 		} catch (UnsupportedEncodingException uee) {
 			throw new AssertionError("UTF-8 is not supported");
+		}
+
+		if (minor == 'b') {
+			/* Revision b fixed a bug in the OpenBSD
+			 * implementation where passwords lengths
+			 * larger than 256 bytes were unintionally
+			 * wrapped due to integer overflow. It does
+			 * this by capping the password length to 72
+			 * characters (excluding the NUL-terminator,
+			 * therefore 73).
+			 * 
+			 * There should technically be no need to do
+			 * so explicitly here since the encryption
+			 * function only uses the first two 72 bytes
+			 * anyway, but do it anyway for compatibility
+			 * "just in case". */
+			if (passwordb.length > 73) {
+				byte[] trim = new byte[73];
+				System.arraycopy(passwordb, 0, trim, 0, 73);
+				passwordb = trim;
+			}
 		}
 
 		saltb = decode_base64(real_salt, BCRYPT_SALT_LEN);
@@ -708,16 +731,23 @@ public class BCrypt {
 	 * @param log_rounds	the log2 of the number of rounds of
 	 * hashing to apply - the work factor therefore increases as
 	 * 2**log_rounds.
+	 * @param minor		the minor revision of the algorithm to use;
+	 * the latest revision is 'b'. Other accepted revisions are 'a'
+	 * and 'y'.
 	 * @param random		an instance of SecureRandom to use
 	 * @return	an encoded salt value
 	 */
-	public static String gensalt(int log_rounds, SecureRandom random) {
+	public static String gensalt(int log_rounds, char minor, SecureRandom random) {
 		StringBuffer rs = new StringBuffer();
 		byte rnd[] = new byte[BCRYPT_SALT_LEN];
 
 		random.nextBytes(rnd);
 
-		rs.append("$2a$");
+		if (minor != 'a' && minor != 'b' && minor != 'y')
+			throw new IllegalArgumentException(
+				"unsupported minor revision: " + minor);
+
+		rs.append("$2" + minor + "$");
 		if (log_rounds < 10)
 			rs.append("0");
 		if (log_rounds > 30) {
@@ -735,10 +765,44 @@ public class BCrypt {
 	 * @param log_rounds	the log2 of the number of rounds of
 	 * hashing to apply - the work factor therefore increases as
 	 * 2**log_rounds.
+	 * @param random		an instance of SecureRandom to use
+	 * @return	an encoded salt value
+	 */
+	public static String gensalt(int log_rounds, SecureRandom random) {
+		/* Support for b-hashes was added on Jan 22, 2020. The
+		 * default revision of generated salts should arguably
+		 * be cahgned to 'b' after some reasonable transition
+		 * period. (A year?) */
+		return gensalt(log_rounds, 'a', random);
+	}
+
+	/**
+	 * Generate a salt for use with the BCrypt.hashpw() method
+	 * @param log_rounds	the log2 of the number of rounds of
+	 * hashing to apply - the work factor therefore increases as
+	 * 2**log_rounds.
+	 * @param minor		the minor revision of the algorithm to use;
+	 * the latest revision is 'b'. Other accepted revisions are 'a'
+	 * and 'y'.
+	 * @return	an encoded salt value
+	 */
+	public static String gensalt(int log_rounds, char minor) {
+		return gensalt(log_rounds, minor, new SecureRandom());
+	}
+
+	/**
+	 * Generate a salt for use with the BCrypt.hashpw() method
+	 * @param log_rounds	the log2 of the number of rounds of
+	 * hashing to apply - the work factor therefore increases as
+	 * 2**log_rounds.
 	 * @return	an encoded salt value
 	 */
 	public static String gensalt(int log_rounds) {
-		return gensalt(log_rounds, new SecureRandom());
+		/* Support for b-hashes was added on Jan 22, 2020. The
+		 * default revision of generated salts should arguably
+		 * be cahgned to 'b' after some reasonable transition
+		 * period. (A year?) */
+		return gensalt(log_rounds, 'a');
 	}
 
 	/**
