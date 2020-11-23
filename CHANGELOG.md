@@ -12,6 +12,7 @@ mvn -U clean versions:display-dependency-updates
 ```
  - Upgraded Junit from 3.8.1 to 4.13.1 (the latest).
  - Added Changelog file
+ - Added .gitignore to avoid checking in Intellij or Maven files.
 
 ## 0.4(.0) jeremyh/jBCrypt taken from djmdjm/jBCrypt
 
