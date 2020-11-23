@@ -59,7 +59,7 @@ import java.security.SecureRandom;
  * 10, and the valid range is 4 to 30.
  *
  * @author Damien Miller
- * @version 0.4
+ * @version 0.4.1
  */
 public class BCrypt {
 	// BCrypt parameters
@@ -388,7 +388,7 @@ public class BCrypt {
 	private static String encode_base64(byte d[], int len)
 		throws IllegalArgumentException {
 		int off = 0;
-		StringBuffer rs = new StringBuffer();
+		StringBuilder rs = new StringBuilder();
 		int c1, c2;
 
 		if (len <= 0 || len > d.length)
@@ -441,7 +441,7 @@ public class BCrypt {
 	 */
 	private static byte[] decode_base64(String s, int maxolen)
 		throws IllegalArgumentException {
-		StringBuffer rs = new StringBuffer();
+		StringBuilder rs = new StringBuilder();
 		int off = 0, slen = s.length(), olen = 0;
 		byte ret[];
 		byte c1, c2, c3, c4, o;
@@ -654,7 +654,7 @@ public class BCrypt {
 		byte passwordb[], saltb[], hashed[];
 		char minor = (char)0;
 		int rounds, off = 0;
-		StringBuffer rs = new StringBuffer();
+		StringBuilder rs = new StringBuilder();
 
 		if (salt.charAt(0) != '$' || salt.charAt(1) != '2')
 			throw new IllegalArgumentException ("Invalid salt version");
@@ -712,7 +712,7 @@ public class BCrypt {
 	 * @return	an encoded salt value
 	 */
 	public static String gensalt(int log_rounds, SecureRandom random) {
-		StringBuffer rs = new StringBuffer();
+		StringBuilder rs = new StringBuilder();
 		byte rnd[] = new byte[BCRYPT_SALT_LEN];
 
 		random.nextBytes(rnd);

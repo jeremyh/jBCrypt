@@ -54,13 +54,13 @@ The code is unchanged from the original jBCrypt 0.4, however:
 
 Install it to your local Maven repository:
 
-	mvn clean javadoc:jar source:jar install
+	mvn clean source:jar install
 
 Use it in your project by adding the following to your project *pom.xml*:
 
         <dependency>
             <groupId>org.mindrot</groupId>
             <artifactId>jbcrypt</artifactId>
-            <version>0.3</version>
+            <version>0.4.1</version>
         </dependency>
 
